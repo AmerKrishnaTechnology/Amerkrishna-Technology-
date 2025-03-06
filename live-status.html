@@ -1,0 +1,2212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Status Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #1e40af;
+            --accent-color: #3b82f6;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --dark-bg: #111827;
+            --card-bg: #1f2937;
+            --text-primary: #ffffff;
+            --text-secondary: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--dark-bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding-top: 4rem;
+        }
+
+        .project-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+            width: 100%;
+        }
+
+        .project-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .project-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .project-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .client-name {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .project-category {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .project-details {
+            padding: 1.5rem;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .status {
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .status.in-progress {
+            background: rgba(213, 140, 13, 0);
+            color: var(--warning-color);
+        }
+
+        .progress-container {
+            background: rgb(241, 0, 0);
+            border-radius: 10px;
+            height: 8px;
+            margin: 1.5rem 0;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 1s ease-in-out;
+        }
+
+        .agent-name {
+            padding: 1rem 1.5rem;
+            background: rgb(230, 200, 7);
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .hold-section {
+            display: none;
+            padding: 1.5rem;
+            background: rgba(239, 68, 68, 0.05);
+            border-left: 3px solid var(--danger-color);
+            margin-top: 1rem;
+        }
+
+        .hold-section.active {
+            display: block;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        .hold-reason {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .hold-duration {
+            font-size: 0.875rem;
+            color: var(--success-color);
+            font-weight: 500;
+        }
+
+        .countdown-timer {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .countdown-green { color: var(--success-color); }
+        .countdown-orange { color: var(--warning-color); }
+        .countdown-red { color: var(--danger-color); }
+
+        .project-actions {
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+
+        .action-button {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+        }
+
+        .action-button:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .hold-button {
+            color: var(--danger-color);
+            border: 1px solid var(--danger-color);
+        }
+
+        .resume-button {
+            color: var(--success-color);
+            border: 1px solid var(--success-color);
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container,
+            .content-container {
+                padding: 0 0.5rem;
+            }
+
+            .project-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Animation Keyframes */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .project-card {
+            animation: slideIn 0.5s ease-out forwards;
+            animation-delay: calc(var(--animation-order) * 0.1s);
+            opacity: 0;
+        }
+
+        /* Enhanced Card Effects */
+        .project-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+        }
+
+        /* Glowing Effect on Hover */
+        .project-card:hover .progress-bar {
+            filter: brightness(1.2);
+        }
+
+        /* Status Badge Animations */
+        .status.in-progress {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .status.in-progress::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.2),
+                transparent
+            );
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            100% {
+                left: 100%;
+            }
+        }
+
+        /* Progress Bar Animation */
+        .progress-bar {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.1),
+                transparent
+            );
+            animation: progressShimmer 2s infinite;
+        }
+
+        @keyframes progressShimmer {
+            100% {
+                left: 100%;
+            }
+        }
+
+        /* Add these styles to your existing CSS */
+        .status.on-hold {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger-color);
+            position: relative;
+        }
+
+        .hold-info {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: rgba(239, 68, 68, 0.05);
+            border-left: 3px solid var(--danger-color);
+            border-radius: 4px;
+        }
+
+        .hold-reason {
+            color: var(--danger-color);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .hold-date {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .progress-bar.paused {
+            opacity: 0.5;
+            background-image: repeating-linear-gradient(
+                45deg,
+                var(--danger-color),
+                var(--danger-color) 10px,
+                rgba(239, 68, 68, 0.7) 10px,
+                rgba(239, 68, 68, 0.7) 20px
+            );
+        }
+
+        /* Add this CSS to your existing styles */
+        .live-project {
+            border: 2px solid var(--success-color);
+            box-shadow: 0 0 10px rgba(16, 184, 129, 0.5);
+        }
+
+        /* Add these styles to your existing CSS */
+        .live-project {
+            position: relative;
+        }
+
+        .live-project::after {
+            content: '🔴 LIVE';
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #ef4444;
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            background: rgba(239, 68, 68, 0.1);
+            animation: pulse 2s infinite;
+        }
+
+        .live-project .progress-bar {
+            background: linear-gradient(90deg, 
+                var(--primary-color),
+                var(--accent-color),
+                var(--success-color)
+            );
+            background-size: 200% 100%;
+            animation: gradientMove 2s linear infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        @keyframes gradientMove {
+            0% { background-position: 100% 0%; }
+            100% { background-position: -100% 0%; }
+        }
+
+        .live-project .status {
+            position: relative;
+            padding-left: 1.5rem;
+        }
+
+        .live-project .status::before {
+            content: '';
+            position: absolute;
+            left: 0.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 8px;
+            height: 8px;
+            background-color: #10b981;
+            border-radius: 50%;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 0.4; }
+            100% { opacity: 1; }
+        }
+
+        /* Add to your existing styles */
+        .additional-content {
+            max-width: 1400px;
+            margin: 4rem auto;
+            padding: 0 2rem;
+        }
+
+        .stats-section {
+            margin-bottom: 4rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .team-card {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .team-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .team-member-info {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .member-avatar {
+            font-size: 3rem;
+            background: rgba(255, 255, 255, 0.1);
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .member-details h3 {
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .member-details p {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .member-stats {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        @media (max-width: 768px) {
+            .additional-content {
+                padding: 0 1rem;
+            }
+            
+            .stats-grid, .team-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Add these new sections after the team-section div */
+
+        /* Technology Stack Section */
+        .tech-stack-section {
+            margin-top: 4rem;
+        }
+
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .tech-card {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .tech-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .tech-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .tech-card h3 {
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+
+        .tech-list {
+            list-style: none;
+            color: var(--text-secondary);
+        }
+
+        .tech-list li {
+            margin-bottom: 0.5rem;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .tech-list li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--primary-color);
+        }
+
+        /* Achievements Section */
+        .achievements-section {
+            margin-top: 4rem;
+        }
+
+        .achievements-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .achievement-card {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .achievement-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .achievement-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .achievement-card h3 {
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+
+        .achievement-card p {
+            color: var(--text-secondary);
+        }
+
+        /* Contact Section */
+        .contact-section {
+            margin-top: 4rem;
+            margin-bottom: 4rem;
+        }
+
+        .contact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .contact-card {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .contact-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .contact-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .contact-card h3 {
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+
+        .contact-card p {
+            color: var(--text-secondary);
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .social-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .social-link:hover {
+            color: var(--primary-color);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .tech-grid,
+            .achievements-grid,
+            .contact-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Software Development & IT Solutions Section */
+        .solutions-section {
+            margin-top: 4rem;
+            padding: 2rem 0;
+        }
+
+        .solutions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .solution-card {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .solution-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+        }
+
+        .solution-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .solution-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .solution-card h3 {
+            color: var(--text-primary);
+            font-size: 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .solution-features {
+            list-style: none;
+            margin-bottom: 2rem;
+        }
+
+        .solution-features li {
+            color: var(--text-secondary);
+            margin-bottom: 0.75rem;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .solution-features li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--primary-color);
+        }
+
+        .solution-stats {
+            display: flex;
+            justify-content: space-between;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .solution-stats span {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Add hover effect for features */
+        .solution-features li:hover {
+            color: var(--text-primary);
+            transform: translateX(5px);
+            transition: all 0.3s ease;
+        }
+
+        /* Add pulsing animation for icons */
+        @keyframes iconPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .solution-card:hover .solution-icon {
+            animation: iconPulse 1s infinite;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .solutions-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .solution-card {
+                padding: 1.5rem;
+            }
+        }
+
+        /* Total Solutions Counter */
+        .solutions-counter {
+            margin-top: 3rem;
+            text-align: center;
+            padding: 2rem;
+            background: linear-gradient(135deg, var(--card-bg), rgba(31, 41, 55, 0.8));
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .counter-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .counter-number {
+            font-size: 3.5rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, var(--primary-color), var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .counter-text {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+        }
+
+        .counter-details {
+            display: flex;
+            gap: 2rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .counter-details span {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Enhanced solution card animations */
+        .solution-card {
+            animation: fadeInUp 0.5s ease-out forwards;
+            opacity: 0;
+            animation-delay: calc(var(--card-order) * 0.1s);
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Add hover effects for solution features */
+        .solution-features li {
+            transition: all 0.3s ease;
+        }
+
+        .solution-features li:hover {
+            transform: translateX(10px);
+            color: var(--primary-color);
+        }
+
+        .right-content {
+            width: 100%;
+            max-width: 100%;
+            margin: 0;
+            padding: 1rem;
+            box-sizing: border-box;
+            flex: 1;
+        }
+
+        .main-content-right {
+            width: 100%;
+            max-width: 100%;
+            margin: 0;
+            padding-left: 1rem;
+            box-sizing: border-box;
+        }
+
+        @media (max-width: 768px) {
+            .right-content,
+            .main-content-right {
+                padding: 0.5rem;
+                margin-top: 1rem;
+            }
+        }
+
+        /* Animated Background */
+        .animated-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: var(--dark-bg);
+            overflow: hidden;
+        }
+
+        .animated-background::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            top: -50%;
+            left: -50%;
+            background: radial-gradient(circle, transparent 20%, var(--dark-bg) 80%),
+                        linear-gradient(45deg, var(--primary-color) 0%, transparent 70%),
+                        linear-gradient(135deg, var(--accent-color) 10%, transparent 80%);
+            animation: rotate 30s linear infinite;
+            opacity: 0.1;
+        }
+
+        .animated-background::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            background: repeating-linear-gradient(
+                45deg,
+                rgba(255, 255, 255, 0.05) 0px,
+                rgba(255, 255, 255, 0.05) 1px,
+                transparent 1px,
+                transparent 10px
+            );
+        }
+
+        /* Header Styles */
+        .header-section {
+            position: relative;
+            padding: 4rem 2rem;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            margin-bottom: 3rem;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .header-title {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, var(--primary-color), var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: titleGlow 2s ease-in-out infinite;
+        }
+
+        .header-subtitle {
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes titleGlow {
+            0%, 100% { filter: brightness(1); }
+            50% { filter: brightness(1.3); }
+        }
+
+        @media (max-width: 768px) {
+            .header-section {
+                padding: 2rem 1rem;
+            }
+            
+            .header-title {
+                font-size: 2rem;
+            }
+            
+            .header-subtitle {
+                font-size: 1rem;
+            }
+        }
+
+        /* Updated animated boxes styles */
+        .animated-boxes {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+        }
+
+        .box {
+            position: absolute;
+            background: rgba(37, 99, 235, 0.1);  /* Lighter blue background */
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(59, 130, 246, 0.3);  /* More visible border */
+            border-radius: 15px;
+            animation: floatBox 20s infinite linear;
+            opacity: 0.7;  /* Increased opacity */
+            box-shadow: 
+                0 4px 12px rgba(37, 99, 235, 0.2),
+                inset 0 0 20px rgba(255, 255, 255, 0.1);  /* Added glow effect */
+        }
+
+        .box:nth-child(1) { 
+            width: 120px; 
+            height: 120px; 
+            left: 10%; 
+            animation-delay: 0s;
+            background: rgba(59, 130, 246, 0.15);  /* Different color for each box */
+        }
+        .box:nth-child(2) { 
+            width: 180px; 
+            height: 180px; 
+            left: 30%; 
+            animation-delay: -5s;
+            background: rgba(99, 102, 241, 0.15);
+        }
+        .box:nth-child(3) { 
+            width: 100px; 
+            height: 100px; 
+            left: 60%; 
+            animation-delay: -10s;
+            background: rgba(147, 51, 234, 0.15);
+        }
+        .box:nth-child(4) { 
+            width: 150px; 
+            height: 150px; 
+            left: 80%; 
+            animation-delay: -15s;
+            background: rgba(192, 38, 211, 0.15);
+        }
+
+        @keyframes floatBox {
+            0% {
+                transform: translateY(-100%) rotate(0deg) scale(1);
+                opacity: 0;
+            }
+            20% {
+                opacity: 0.7;
+                transform: translateY(20%) rotate(90deg) scale(1.1);
+            }
+            80% {
+                opacity: 0.7;
+                transform: translateY(80%) rotate(270deg) scale(0.9);
+            }
+            100% {
+                transform: translateY(1000%) rotate(360deg) scale(1);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="animated-background"></div>
+    <div class="animated-boxes">
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+    </div>
+    <div class="header-section">
+        <h1 class="header-title">Project Status Dashboard</h1>
+        <p class="header-subtitle">Real-time monitoring and tracking of our ongoing projects, showcasing our commitment to transparency and excellence in delivery.</p>
+    </div>
+        <div class="project-grid">
+            <!-- Project 1: EkomStore Website Redesign -->
+            <div class="project-card" id="project1">
+                <div class="project-header">
+                    <span class="client-name">EkomStore coupon</span>
+                    <span class="project-category">Web Development & custom plugin design</span>
+                </div>
+                <div class="project-details">
+                    <div class="detail-row">
+                        <span class="label">Status:</span>
+                        <span id="projectStatus1" class="status in-progress">In Progress</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">Time Left:</span>
+                        <span id="timer1" class="countdown-timer countdown-green"></span>
+                    </div>
+                </div>
+                <div class="progress-container">
+                    <div id="progressBar1" class="progress-bar" style="width: 60%; background-color: #f39c12;"></div>
+                </div>
+                <div class="agent-name">Agent: Varun</div>
+            </div>
+
+            <!-- Project 2: Mannsafar Website Development -->
+            <div class="project-card" id="project2">
+                <div class="project-header">
+                    <span class="client-name">Mannsafar</span>
+                    <span class="project-category">Web Design</span>
+                </div>
+                <div class="project-details">
+                    <div class="detail-row">
+                        <span class="label">Status:</span>
+                        <span id="projectStatus2" class="status in-progress">In Progress</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">Time Left:</span>
+                        <span id="timer2" class="countdown-timer countdown-orange"></span>
+                    </div>
+                </div>
+                <div class="progress-container">
+                    <div id="progressBar2" class="progress-bar" style="width: 30%; background-color: #3498db;"></div>
+                </div>
+                <div class="agent-name">Agent: Varun</div>
+            </div>
+
+            <!-- Project 3: Custom Software Development -->
+            <div class="project-card" id="project3">
+                <div class="project-header">
+                    <span class="client-name">Vastu</span>
+                    <span class="project-category">Custom Software Development</span>
+                </div>
+                <div class="project-details">
+                    <div class="detail-row">
+                        <span class="label">Status:</span>
+                        <span id="projectStatus3" class="status on-hold">On Hold</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">Time Left:</span>
+                        <span id="timer3" class="countdown-timer countdown-red"></span>
+                    </div>
+                    <div class="hold-info">
+                        <div class="hold-reason">Project temporarily paused for technical review</div>
+                        <div class="hold-date">Paused on: <?php echo date('M d, Y'); ?></div>
+                    </div>
+                </div>
+                <div class="progress-container">
+                    <div id="progressBar3" class="progress-bar paused" style="width: 80%; background-color: #ef4444;"></div>
+                </div>
+                <div class="agent-name">Agent: Amerkrishna</div>
+            </div>
+
+            <!-- Project 4: EkomStore Advertising Solutions -->
+            <div class="project-card" id="project4">
+                <div class="project-header">
+                    <span class="client-name">EkomStore</span>
+                    <span class="project-category">Ads & Marketing</span>
+                </div>
+                <div class="project-details">
+                    <div class="detail-row">
+                        <span class="label">Status:</span>
+                        <span id="projectStatus4" class="status in-progress">In Progress</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">Time Left:</span>
+                        <span id="timer4" class="countdown-timer countdown-green"></span>
+                    </div>
+                </div>
+                <div class="progress-container">
+                    <div id="progressBar4" class="progress-bar" style="width: 50%; background-color: #f39c12;"></div>
+                </div>
+                <div class="agent-name">Agent: Farooq Khan</div>
+            </div>
+
+            <!-- Project 5: AI Integration Project -->
+            <div class="project-card" id="project5">
+                <div class="project-header">
+                    <span class="client-name">TechVision AI</span>
+                    <span class="project-category">AI & Machine Learning Integration</span>
+                </div>
+                <div class="project-details">
+                    <div class="detail-row">
+                        <span class="label">Status:</span>
+                        <span id="projectStatus5" class="status in-progress">In Progress</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">Time Left:</span>
+                        <span id="timer5" class="countdown-timer countdown-orange"></span>
+                    </div>
+                </div>
+                <div class="progress-container">
+                    <div id="progressBar5" class="progress-bar" style="width: 45%; background-color: #9b59b6;"></div>
+                </div>
+                <div class="agent-name">Agent: Rahul Dev</div>
+            </div>
+
+            <!-- Project 6: E-Commerce Platform -->
+            <div class="project-card" id="project6">
+                <div class="project-header">
+                    <span class="client-name">ShopMart Plus</span>
+                    <span class="project-category">E-Commerce Development</span>
+                </div>
+                <div class="project-details">
+                    <div class="detail-row">
+                        <span class="label">Status:</span>
+                        <span id="projectStatus6" class="status in-progress">In Progress</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">Time Left:</span>
+                        <span id="timer6" class="countdown-timer countdown-green"></span>
+                    </div>
+                </div>
+                <div class="progress-container">
+                    <div id="progressBar6" class="progress-bar" style="width: 70%; background-color: #2ecc71;"></div>
+                </div>
+                <div class="agent-name">Agent: Sarah Khan</div>
+            </div>
+        </div>
+    </div>
+<body>
+    <script>
+        // Project deadlines
+        const projectDeadlines = {
+            'project1': {
+                deadline: '2025-03-22',
+                title: 'EkomStore coupon'
+            },
+            'project2': {
+                deadline: '2025-03-15',
+                title: 'Mannsafar'
+            },
+            'project3': {
+                deadline: 'hold',
+                title: 'Vastu'
+            },
+            'project4': {
+                deadline: '2025-03-30',
+                title: 'EkomStore'
+            },
+            'project5': {
+                deadline: '2025-04-15',
+                title: 'TechVision AI'
+            },
+            'project6': {
+                deadline: '2025-03-25',
+                title: 'ShopMart Plus'
+            }
+        };
+    
+        function updateTimers() {
+    const now = new Date().getTime();
+
+    for (const [projectId, project] of Object.entries(projectDeadlines)) {
+        const timerElement = document.getElementById(`timer${projectId.slice(-1)}`);
+        const statusElement = document.getElementById(`projectStatus${projectId.slice(-1)}`);
+
+        if (timerElement && statusElement) {
+            // Check if project is on hold (Project 3 - Vastu)
+            if (projectId === 'project3') {
+                timerElement.textContent = 'Project On Hold';
+                timerElement.className = 'countdown-timer countdown-red';
+                statusElement.className = 'status on-hold';
+                statusElement.textContent = 'On Hold';
+                continue;
+            }
+
+            const deadline = new Date(project.deadline).getTime();
+            const timeLeft = deadline - now;
+
+            if (timeLeft > 0) {
+                const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+
+                timerElement.textContent = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+
+                if (days <= 3) {
+                    timerElement.className = 'countdown-timer countdown-red';
+                } else if (days <= 7) {
+                    timerElement.className = 'countdown-timer countdown-orange';
+                } else {
+                    timerElement.className = 'countdown-timer countdown-green';
+                }
+            } else {
+                timerElement.textContent = 'Deadline Passed';
+                timerElement.className = 'countdown-timer countdown-red';
+            }
+        }
+    }
+}
+   
+        // Start the timer when the document is fully loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initial update
+            updateTimers();
+            // Update every second
+            setInterval(updateTimers, 1000);
+        });
+    </script>
+    <body>
+        <!-- Navigation Menu -->
+        <nav class="navbar">
+            <div class="nav-container">
+                <div class="logo">
+                    <a href="index.html">
+                        <img src="image/Screenshot 2025-02-22 224711.png" alt="AmerKrishna Logo">
+                    </a>
+                </div>
+                <div class="menu-toggle" id="mobile-menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+                <ul class="nav-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="about-us.html">About</a></li>
+                    <li><a href="#">AI Tool</a></li>
+                    <li class="services-dropdown">
+                        <a href="#" class="dropdown-trigger">Services <i class="fas fa-chevron-down"></i></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="it-services.html">IT Services</a></li>
+                            <li><a href="comprehensive-status.html">Project Management</a></li>
+                        </ul>
+                    </li>
+                    <a href="live-status.html" class="nav-link project-status">
+                        <i class="fas fa-chart-line"></i>
+                        Project Status
+                        <span class="status-badge">LIVE</span>
+                    <li><a href="#">IT Services & Solutions</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </div>
+        </nav>
+    
+        <!-- Add this CSS in your existing style section -->
+        <style>
+        /* Navigation Styles */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(26, 16, 63, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+    
+        .logo img {
+            height: 50px;
+            transition: transform 0.3s ease;
+        }
+    
+        .logo img:hover {
+            transform: scale(1.05);
+        }
+    
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+    
+        .nav-links li {
+            position: relative;
+        }
+    
+        .nav-links a {
+            color: var(--text-white);
+            text-decoration: none;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: color 0.3s ease;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+        }
+    
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: var(--accent-blue);
+            background: rgba(255, 255, 255, 0.1);
+        }
+    
+        /* Dropdown Styles */
+        .services-dropdown {
+            position: relative;
+        }
+    
+        .dropdown-trigger {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+    
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: rgba(26, 16, 63, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 0.5rem;
+            min-width: 200px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+            list-style: none;
+        }
+    
+        .services-dropdown:hover .dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+    
+        .dropdown-menu li {
+            margin: 0.5rem 0;
+        }
+    
+        .dropdown-menu a {
+            padding: 0.5rem 1rem;
+            display: block;
+            color: var(--text-white);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+    
+        .dropdown-menu a:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+    
+        /* Mobile Menu Toggle */
+        .menu-toggle {
+            display: none;
+            flex-direction: column;
+            gap: 6px;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+    
+        .menu-toggle span {
+            display: block;
+            width: 25px;
+            height: 2px;
+            background: var(--text-white);
+            transition: all 0.3s ease;
+        }
+    
+        @media (max-width: 768px) {
+            .menu-toggle {
+                display: flex;
+            }
+    
+            .nav-links {
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: rgba(26, 16, 63, 0.95);
+                backdrop-filter: blur(10px);
+                flex-direction: column;
+                padding: 1rem;
+                gap: 1rem;
+                display: none;
+                border-top: 1px solid rgba(255, 255, 255, 0.1);
+            }
+    
+            .nav-links.active {
+                display: flex;
+            }
+    
+            .dropdown-menu {
+                position: static;
+                background: transparent;
+                border: none;
+                opacity: 1;
+                visibility: visible;
+                transform: none;
+                padding-left: 1rem;
+                display: none;
+            }
+    
+            .services-dropdown.active .dropdown-menu {
+                display: block;
+            }
+        }
+        </style>
+    
+        <!-- Add this JavaScript before the closing body tag -->
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const mobileMenu = document.getElementById('mobile-menu');
+                const navLinks = document.querySelector('.nav-links');
+                const dropdownTriggers = document.querySelectorAll('.dropdown-trigger');
+    
+                mobileMenu.addEventListener('click', function() {
+                    navLinks.classList.toggle('active');
+                    this.classList.toggle('active');
+                });
+    
+                dropdownTriggers.forEach(trigger => {
+                    trigger.addEventListener('click', function(e) {
+                        if (window.innerWidth <= 768) {
+                            e.preventDefault();
+                            this.parentElement.classList.toggle('active');
+                        }
+                    });
+                });
+            });
+        </script>
+</body>
+    <!-- Add this after the project-status-section div -->
+    <div class="additional-content">
+        <div class="stats-section">
+            <h2 class="section-title">Project Statistics</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">📈</div>
+                    <div class="stat-number">85%</div>
+                    <div class="stat-label">Overall Success Rate</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">⏱️</div>
+                    <div class="stat-number">98%</div>
+                    <div class="stat-label">On-Time Delivery</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">👥</div>
+                    <div class="stat-number">50+</div>
+                    <div class="stat-label">Active Clients</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🌟</div>
+                    <div class="stat-number">4.9</div>
+                    <div class="stat-label">Client Satisfaction</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="team-section">
+            <h2 class="section-title">Development Team</h2>
+            <div class="team-grid">
+                <div class="team-card">
+                    <div class="team-member-info">
+                        <div class="member-avatar">👨‍💻</div>
+                        <div class="member-details">
+                            <h3>Varun</h3>
+                            <p>Lead Developer</p>
+                            <div class="member-stats">
+                                <span>Projects: 8</span>
+                                <span>Success Rate: 95%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="team-card">
+                    <div class="team-member-info">
+                        <div class="member-avatar">👨‍💻</div>
+                        <div class="member-details">
+                            <h3>Amerkrishna</h3>
+                            <p>Senior Developer</p>
+                            <div class="member-stats">
+                                <span>Projects: 6</span>
+                                <span>Success Rate: 92%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="team-card">
+                    <div class="team-member-info">
+                        <div class="member-avatar">👨‍💻</div>
+                        <div class="member-details">
+                            <h3>Farooq Khan</h3>
+                            <p>Marketing Specialist</p>
+                            <div class="member-stats">
+                                <span>Projects: 5</span>
+                                <span>Success Rate: 94%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Technology Stack Section -->
+        <div class="tech-stack-section">
+            <h2 class="section-title">Our Technology Stack</h2>
+            <div class="tech-grid">
+                <div class="tech-card">
+                    <div class="tech-icon">⚛️</div>
+                    <h3>Frontend</h3>
+                    <ul class="tech-list">
+                        <li>React.js</li>
+                        <li>Vue.js</li>
+                        <li>Next.js</li>
+                        <li>TypeScript</li>
+                    </ul>
+                </div>
+                <div class="tech-card">
+                    <div class="tech-icon">🔧</div>
+                    <h3>Backend</h3>
+                    <ul class="tech-list">
+                        <li>Node.js</li>
+                        <li>Python</li>
+                        <li>PHP</li>
+                        <li>Java</li>
+                    </ul>
+                </div>
+                <div class="tech-card">
+                    <div class="tech-icon">🗄️</div>
+                    <h3>Database</h3>
+                    <ul class="tech-list">
+                        <li>MongoDB</li>
+                        <li>MySQL</li>
+                        <li>PostgreSQL</li>
+                        <li>Redis</li>
+                    </ul>
+                </div>
+                <div class="tech-card">
+                    <div class="tech-icon">☁️</div>
+                    <h3>Cloud & DevOps</h3>
+                    <ul class="tech-list">
+                        <li>AWS</li>
+                        <li>Docker</li>
+                        <li>Kubernetes</li>
+                        <li>CI/CD</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Achievements Section -->
+        <div class="achievements-section">
+            <h2 class="section-title">Recent Achievements</h2>
+            <div class="achievements-grid">
+                <div class="achievement-card">
+                    <div class="achievement-icon">🏆</div>
+                    <h3>Best Web Solution 2023</h3>
+                    <p>Awarded for EkomStore's innovative e-commerce platform</p>
+                </div>
+                <div class="achievement-card">
+                    <div class="achievement-icon">🚀</div>
+                    <h3>100+ Projects Delivered</h3>
+                    <p>Successfully completed projects in last quarter</p>
+                </div>
+                <div class="achievement-card">
+                    <div class="achievement-icon">⭐</div>
+                    <h3>Client Satisfaction</h3>
+                    <p>Maintained 98% client satisfaction rate</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Software Development & IT Solutions Section -->
+        <div class="solutions-section">
+            <h2 class="section-title">105+ Software Development & IT Solutions</h2>
+            <div class="solutions-grid">
+                <!-- Web Development Solutions -->
+                <div class="solution-card">
+                    <div class="solution-icon">🌐</div>
+                    <h3>Web Development (25+)</h3>
+                    <ul class="solution-features">
+                        <li>E-commerce Solutions</li>
+                        <li>CMS Development</li>
+                        <li>Progressive Web Apps</li>
+                        <li>Custom Web Portals</li>
+                        <li>API Development</li>
+                    </ul>
+                    <div class="solution-stats">
+                        <span>25+ Solutions</span>
+                        <span>98% Success Rate</span>
+                    </div>
+                </div>
+
+                <!-- Mobile Development -->
+                <div class="solution-card">
+                    <div class="solution-icon">📱</div>
+                    <h3>Mobile Solutions (20+)</h3>
+                    <ul class="solution-features">
+                        <li>Native iOS Apps</li>
+                        <li>Android Development</li>
+                        <li>Cross-Platform Apps</li>
+                        <li>Mobile UI/UX Design</li>
+                        <li>App Maintenance</li>
+                    </ul>
+                    <div class="solution-stats">
+                        <span>20+ Solutions</span>
+                        <span>96% Success Rate</span>
+                    </div>
+                </div>
+
+                <!-- Enterprise Solutions -->
+                <div class="solution-card">
+                    <div class="solution-icon">🏢</div>
+                    <h3>Enterprise Solutions (15+)</h3>
+                    <ul class="solution-features">
+                        <li>ERP Systems</li>
+                        <li>CRM Solutions</li>
+                        <li>Business Intelligence</li>
+                        <li>Workflow Automation</li>
+                        <li>Legacy Modernization</li>
+                    </ul>
+                    <div class="solution-stats">
+                        <span>15+ Solutions</span>
+                        <span>97% Success Rate</span>
+                    </div>
+                </div>
+
+                <!-- AI & ML Solutions -->
+                <div class="solution-card">
+                    <div class="solution-icon">🤖</div>
+                    <h3>AI & ML Services (10+)</h3>
+                    <ul class="solution-features">
+                        <li>Machine Learning Models</li>
+                        <li>Natural Language Processing</li>
+                        <li>Computer Vision</li>
+                        <li>Predictive Analytics</li>
+                        <li>AI Integration</li>
+                    </ul>
+                    <div class="solution-stats">
+                        <span>10+ Solutions</span>
+                        <span>94% Success Rate</span>
+                    </div>
+                </div>
+
+                <!-- Cloud Services -->
+                <div class="solution-card">
+                    <div class="solution-icon">☁️</div>
+                    <h3>Cloud Solutions (15+)</h3>
+                    <ul class="solution-features">
+                        <li>Cloud Migration</li>
+                        <li>AWS Services</li>
+                        <li>Azure Solutions</li>
+                        <li>Cloud Security</li>
+                        <li>DevOps Services</li>
+                    </ul>
+                    <div class="solution-stats">
+                        <span>15+ Solutions</span>
+                        <span>99% Success Rate</span>
+                    </div>
+                </div>
+
+                <!-- Security Solutions -->
+                <div class="solution-card">
+                    <div class="solution-icon">🔒</div>
+                    <h3>Security Services (10+)</h3>
+                    <ul class="solution-features">
+                        <li>Penetration Testing</li>
+                        <li>Security Audits</li>
+                        <li>Compliance Solutions</li>
+                        <li>Data Protection</li>
+                        <li>Security Training</li>
+                    </ul>
+                    <div class="solution-stats">
+                        <span>10+ Solutions</span>
+                        <span>100% Success Rate</span>
+                    </div>
+                </div>
+
+                <!-- Digital Marketing -->
+                <div class="solution-card">
+                    <div class="solution-icon">📈</div>
+                    <h3>Digital Marketing (5+)</h3>
+                    <ul class="solution-features">
+                        <li>SEO Services</li>
+                        <li>Social Media Marketing</li>
+                        <li>Content Strategy</li>
+                        <li>Analytics & Reporting</li>
+                        <li>PPC Campaigns</li>
+                    </ul>
+                    <div class="solution-stats">
+                        <span>5+ Solutions</span>
+                        <span>95% Success Rate</span>
+                    </div>
+                </div>
+
+                <!-- Consulting Services -->
+                <div class="solution-card">
+                    <div class="solution-icon">💡</div>
+                    <h3>IT Consulting (5+)</h3>
+                    <ul class="solution-features">
+                        <li>Technology Strategy</li>
+                        <li>Digital Transformation</li>
+                        <li>Process Optimization</li>
+                        <li>IT Infrastructure</li>
+                        <li>Project Management</li>
+                    </ul>
+                    <div class="solution-stats">
+                        <span>5+ Solutions</span>
+                        <span>98% Success Rate</span>
+                    </div>
+                </div>
+
+                <!-- IoT Solutions -->
+                <div class="solution-card">
+                    <div class="solution-icon">🔌</div>
+                    <h3>IoT Solutions (8+)</h3>
+                    <ul class="solution-features">
+                        <li>IoT Device Management</li>
+                        <li>Smart Home Solutions</li>
+                        <li>Industrial IoT</li>
+                        <li>IoT Data Analytics</li>
+                        <li>Connected Devices</li>
+                    </ul>
+                    <div class="solution-stats">
+                        <span>8+ Solutions</span>
+                        <span>96% Success Rate</span>
+                    </div>
+                </div>
+
+                <!-- Blockchain Solutions -->
+                <div class="solution-card">
+                    <div class="solution-icon">⛓️</div>
+                    <h3>Blockchain Services (5+)</h3>
+                    <ul class="solution-features">
+                        <li>Smart Contracts</li>
+                        <li>DeFi Solutions</li>
+                        <li>NFT Platforms</li>
+                        <li>Cryptocurrency Integration</li>
+                        <li>Blockchain Security</li>
+                    </ul>
+                    <div class="solution-stats">
+                        <span>5+ Solutions</span>
+                        <span>92% Success Rate</span>
+                    </div>
+                </div>
+
+                <!-- Data Analytics -->
+                <div class="solution-card">
+                    <div class="solution-icon">📊</div>
+                    <h3>Data Analytics (7+)</h3>
+                    <ul class="solution-features">
+                        <li>Big Data Solutions</li>
+                        <li>Business Analytics</li>
+                        <li>Data Visualization</li>
+                        <li>Predictive Modeling</li>
+                        <li>Real-time Analytics</li>
+                    </ul>
+                    <div class="solution-stats">
+                        <span>7+ Solutions</span>
+                        <span>97% Success Rate</span>
+                    </div>
+                </div>
+
+                <!-- Quality Assurance -->
+                <div class="solution-card">
+                    <div class="solution-icon">✅</div>
+                    <h3>QA Services (10+)</h3>
+                    <ul class="solution-features">
+                        <li>Automated Testing</li>
+                        <li>Performance Testing</li>
+                        <li>Security Testing</li>
+                        <li>Mobile App Testing</li>
+                        <li>API Testing</li>
+                    </ul>
+                    <div class="solution-stats">
+                        <span>10+ Solutions</span>
+                        <span>99% Success Rate</span>
+                    </div>
+                </div>
+
+                <!-- UI/UX Design -->
+                <div class="solution-card">
+                    <div class="solution-icon">🎨</div>
+                    <h3>UI/UX Design (8+)</h3>
+                    <ul class="solution-features">
+                        <li>User Interface Design</li>
+                        <li>User Experience Design</li>
+                        <li>Responsive Design</li>
+                        <li>Mobile App Design</li>
+                        <li>Design Systems</li>
+                    </ul>
+                    <div class="solution-stats">
+                        <span>8+ Solutions</span>
+                        <span>98% Success Rate</span>
+                    </div>
+                </div>
+
+                <!-- AR/VR Solutions -->
+                <div class="solution-card">
+                    <div class="solution-icon">🥽</div>
+                    <h3>AR/VR Development (5+)</h3>
+                    <ul class="solution-features">
+                        <li>Augmented Reality Apps</li>
+                        <li>Virtual Reality Solutions</li>
+                        <li>Mixed Reality</li>
+                        <li>3D Modeling</li>
+                        <li>Interactive Experiences</li>
+                    </ul>
+                    <div class="solution-stats">
+                        <span>5+ Solutions</span>
+                        <span>93% Success Rate</span>
+                    </div>
+                </div>
+
+                <!-- Support & Maintenance -->
+                <div class="solution-card">
+                    <div class="solution-icon">🛠️</div>
+                    <h3>Support Services (12+)</h3>
+                    <ul class="solution-features">
+                        <li>24/7 Technical Support</li>
+                        <li>Application Maintenance</li>
+                        <li>Performance Optimization</li>
+                        <li>Security Updates</li>
+                        <li>System Monitoring</li>
+                    </ul>
+                    <div class="solution-stats">
+                        <span>12+ Solutions</span>
+                        <span>100% Success Rate</span>
+                    </div>
+                </div>
+
+                <!-- Custom Integration -->
+                <div class="solution-card">
+                    <div class="solution-icon">🔄</div>
+                    <h3>Integration Services (10+)</h3>
+                    <ul class="solution-features">
+                        <li>API Integration</li>
+                        <li>Third-party Services</li>
+                        <li>Payment Gateways</li>
+                        <li>CRM Integration</li>
+                        <li>ERP Integration</li>
+                    </ul>
+                    <div class="solution-stats">
+                        <span>10+ Solutions</span>
+                        <span>96% Success Rate</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Solutions Counter -->
+        <div class="solutions-counter">
+            <div class="counter-content">
+                <span class="counter-number">105+</span>
+                <span class="counter-text">Core Technology Solutions</span>
+                <div class="counter-details">
+                    <span>✓ Industry-Specific Solutions</span>
+                    <span>✓ Emerging Technologies</span>
+                    <span>✓ Specialized Services</span>
+                    <span>✓ Research & Innovation</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<!-- Footer Section -->
+<footer class="footer">
+    <div class="footer-top">
+        <div class="container">
+            <div class="footer-grid">
+                <!-- Company Info -->
+                <div class="footer-col">
+                    <div class="footer-logo">
+                        <img src="image/Screenshot 2025-02-22 224711.png" alt="AmerKrishna Logo">
+                    </div>
+                    <p class="company-desc">Empowering businesses with innovative digital solutions. Your trusted partner in technology and digital transformation.</p>
+                    <div class="footer-social">
+                        <a href="https://www.linkedin.com/company/101995529/admin?lipi=urn%3Ali%3Apage%3Aorganization_admin_admin_index%3Bae3233e9-658e-42db-9305-e44c2768209d" class="social-link"><i class="fab fa-linkedin"></i></a>
+                        <a href="https://wa.me/9149858527" class="social-link"><i class="fab fa-whatsapp"></i></a>
+                        <a href="https://www.facebook.com/281627698367040" class="social-link"><i class="fab fa-facebook"></i></a>
+                        <a href="https://www.instagram.com/amerkrishnatech?igsh=dzZ5Ym4xbzA2bnh2" class="social-link"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+
+                <!-- Quick Links -->
+                <div class="footer-col">
+                    <h4>Quick Links</h4>
+                    <ul class="footer-links">
+                        <li><a href="about-us.html">About Us</a></li>
+                        <li><a href="comprehensive-status.html">Services</a></li>
+                        <li><a href="Software Development.html">IT Solutions</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                        <li><a href="live-status.html">Project Status</a></li>
+                    </ul>
+                </div>
+
+                <!-- Services -->
+                <div class="footer-col">
+                    <h4>Our Services</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">Web Development</a></li>
+                        <li><a href="#">Mobile Apps</a></li>
+                        <li><a href="#">Cloud Solutions</a></li>
+                        <li><a href="#">AI & Machine Learning</a></li>
+                        <li><a href="#">IT Consulting</a></li>
+                    </ul>
+                </div>
+
+                <!-- Contact Info -->
+                <div class="footer-col">
+                    <h4>Contact Us</h4>
+                    <div class="contact-info">
+                        <p><i class="fas fa-phone"></i> +91 914-985-8527</p>
+                        <p><i class="fas fa-envelope"></i> support@amerkrishna.com</p>
+                        <p><i class="fas fa-location-dot"></i> Lucknow, Uttar Pradesh, India</p>
+                    </div>
+                    <div class="newsletter">
+                        <h4>Newsletter</h4>
+                        <form class="subscribe-form">
+                            <input type="email" placeholder="Enter your email">
+                            <button type="submit"><i class="fas fa-paper-plane"></i></button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer-bottom">
+        <div class="container">
+            <div class="footer-bottom-content">
+                <p>&copy; 2024 AmerKrishna Technology. All rights reserved.</p>
+                <div class="footer-bottom-links">
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                    <a href="#">Cookie Policy</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<style>
+/* Footer Styles */
+.footer {
+    background: var(--secondary-purple);
+    color: var(--text-white);
+    margin-top: 4rem;
+}
+
+.footer-top {
+    padding: 4rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.footer-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 3rem;
+}
+
+.footer-col h4 {
+    color: var(--text-white);
+    font-size: 1.2rem;
+    margin-bottom: 1.5rem;
+}
+
+.footer-logo img {
+    height: 60px;
+    margin-bottom: 1rem;
+}
+
+.company-desc {
+    color: var(--text-gray);
+    margin-bottom: 1.5rem;
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+.footer-social {
+    display: flex;
+    gap: 1rem;
+}
+
+.social-link {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-white);
+    transition: var(--transition);
+}
+
+.social-link:hover {
+    background: var(--accent-blue);
+    transform: translateY(-3px);
+}
+
+.footer-links {
+    list-style: none;
+}
+
+.footer-links li {
+    margin-bottom: 0.75rem;
+}
+
+.footer-links a {
+    color: var(--text-gray);
+    text-decoration: none;
+    transition: var(--transition);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.footer-links a:hover {
+    color: var(--accent-blue);
+    transform: translateX(5px);
+}
+
+.contact-info p {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    color: var(--text-gray);
+    margin-bottom: 1rem;
+}
+
+.newsletter {
+    margin-top: 2rem;
+}
+
+.subscribe-form {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.subscribe-form input {
+    flex: 1;
+    padding: 0.75rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-white);
+}
+
+.subscribe-form button {
+    padding: 0.75rem 1.25rem;
+    background: var(--accent-blue);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.subscribe-form button:hover {
+    background: #2563eb;
+    transform: translateY(-2px);
+}
+
+.footer-bottom {
+    padding: 1.5rem 0;
+}
+
+.footer-bottom-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.footer-bottom p {
+    color: var(--text-gray);
+}
+
+.footer-bottom-links {
+    display: flex;
+    gap: 2rem;
+}
+
+.footer-bottom-links a {
+    color: var(--text-gray);
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+.footer-bottom-links a:hover {
+    color: var(--accent-blue);
+}
+
+@media (max-width: 1024px) {
+    .footer-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .footer-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .footer-bottom-content {
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+    }
+
+    .footer-bottom-links {
+        justify-content: center;
+    }
+}
+</style>
+<!-- Total Solutions Counter -->
+<div class="solutions-counter">
+    <div class="counter-content">
+        <div class="counter-number">105+</div>
+        <div class="counter-text">Total IT Solutions & Services</div>
+        <div class="counter-details">
+            <span>16 Categories</span>
+            <span>•</span>
+            <span>97% Success Rate</span>
+            <span>•</span>
+            <span>50+ Active Clients</span>
+        </div>
+    </div>
+</div>
+</div> <!-- End of solutions-section --></div>
+</html>

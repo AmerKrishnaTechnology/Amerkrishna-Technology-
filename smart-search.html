@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Smart Search - AmerKrishna Technology</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #3b82f6;
+            --secondary-color: #1a1a2e;
+            --accent-color: #60a5fa;
+            --text-white: #ffffff;
+            --text-gray: #94a3b8;
+            --bg-dark: #0f0f1a;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: var(--bg-dark);
+            color: var(--text-white);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .search-container {
+            background: var(--secondary-color);
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .search-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, var(--primary-color), var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-white);
+            font-size: 1rem;
+        }
+
+        .search-button {
+            padding: 1rem 2rem;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .search-button:hover {
+            background: var(--accent-color);
+            transform: translateY(-2px);
+        }
+
+        .filters {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 0.5rem 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 20px;
+            color: var(--text-white);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .filter-btn.active {
+            background: var(--primary-color);
+        }
+
+        .results {
+            display: none;
+        }
+
+        .result-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .result-title {
+            color: var(--accent-color);
+            margin-bottom: 0.5rem;
+            font-size: 1.2rem;
+        }
+
+        .result-description {
+            color: var(--text-gray);
+        }
+
+        .suggestions {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+        }
+
+        .suggestion-item {
+            padding: 0.5rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .suggestion-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="search-container">
+            <div class="search-header">
+                <h1>AI-Powered Smart Search</h1>
+                <p>Find exactly what you're looking for with intelligent search and filtering</p>
+            </div>
+
+            <div class="search-box">
+                <input type="text" class="search-input" placeholder="Enter your search query..." id="searchInput">
+                <button class="search-button" onclick="performSearch()">
+                    <i class="fas fa-search"></i>
+                    Search
+                </button>
+            </div>
+
+            <div class="filters">
+                <button class="filter-btn active">All</button>
+                <button class="filter-btn">Products</button>
+                <button class="filter-btn">Services</button>
+                <button class="filter-btn">Documentation</button>
+                <button class="filter-btn">Support</button>
+            </div>
+
+            <div class="results" id="searchResults">
+                <!-- Results will be populated here -->
+            </div>
+
+            <div class="suggestions" id="searchSuggestions">
+                <h3>Popular Searches</h3>
+                <div class="suggestion-item">Web Development Services</div>
+                <div class="suggestion-item">Mobile App Development</div>
+                <div class="suggestion-item">Cloud Solutions</div>
+                <div class="suggestion-item">AI Integration</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function performSearch() {
+            const searchInput = document.getElementById('searchInput').value.toLowerCase();
+            const resultsDiv = document.getElementById('searchResults');
+            
+            // Show results container
+            resultsDiv.style.display = 'block';
+            
+            // Clear previous results
+            resultsDiv.innerHTML = '';
+            
+            // Simulate search results
+            const searchResults = [
+                {
+                    title: 'Web Development Services',
+                    description: 'Professional web development services including frontend, backend, and full-stack solutions.'
+                },
+                {
+                    title: 'Mobile App Development',
+                    description: 'Custom mobile application development for iOS and Android platforms.'
+                },
+                {
+                    title: 'Cloud Solutions',
+                    description: 'Secure and scalable cloud hosting solutions with 24/7 support.'
+                }
+            ];
+            
+            // Filter and display results
+            const filteredResults = searchResults.filter(result => 
+                result.title.toLowerCase().includes(searchInput) || 
+                result.description.toLowerCase().includes(searchInput)
+            );
+            
+            if (filteredResults.length > 0) {
+                filteredResults.forEach(result => {
+                    const resultItem = document.createElement('div');
+                    resultItem.className = 'result-item';
+                    resultItem.innerHTML = `
+                        <div class="result-title">${result.title}</div>
+                        <div class="result-description">${result.description}</div>
+                    `;
+                    resultsDiv.appendChild(resultItem);
+                });
+            } else {
+                resultsDiv.innerHTML = '<div class="result-item">No results found</div>';
+            }
+        }
+
+        // Handle filter buttons
+        document.querySelectorAll('.filter-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                performSearch();
+            });
+        });
+
+        // Handle search on enter key
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                performSearch();
+            }
+        });
+    </script>
+</body>
+</html>

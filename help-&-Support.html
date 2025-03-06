@@ -1,0 +1,207 @@
+<style>
+    :root {
+        --primary-color: #2D1B69;
+        --secondary-color: #3B82F6;
+        --accent-color: #60A5FA;
+        --background-color: #F8FAFC;
+        --text-color: #1E293B;
+        --text-light: #64748B;
+        --border-color: #E2E8F0;
+        --hover-color: #EEF2FF;
+        --shadow-color: rgba(45, 27, 105, 0.1);
+        --gradient: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    body {
+        font-family: 'Inter', sans-serif;
+        background: var(--background-color);
+        color: var(--text-color);
+        line-height: 1.7;
+    }
+
+    .container {
+        max-width: 1000px;
+        margin: 40px auto;
+        background: white;
+        padding: 40px;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px var(--shadow-color);
+    }
+
+    h1 {
+        font-size: 3rem;
+        font-weight: 800;
+        background: var(--gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-align: center;
+        margin-bottom: 2.5rem;
+    }
+
+    /* Enhanced FAQ Section */
+    .faq-section {
+        margin: 50px 0;
+    }
+
+    .faq {
+        background: white;
+        padding: 25px;
+        border-radius: 15px;
+        margin-bottom: 20px;
+        cursor: pointer;
+        border: 1px solid var(--border-color);
+        box-shadow: 0 4px 6px var(--shadow-color);
+        transition: var(--transition);
+    }
+
+    .faq strong {
+        font-size: 1.1rem;
+        color: var(--primary-color);
+        display: block;
+        padding-right: 30px;
+    }
+
+    .faq:hover {
+        transform: translateY(-3px);
+        border-color: var(--secondary-color);
+    }
+
+    .faq-answer {
+        margin-top: 15px;
+        padding: 15px;
+        background: var(--hover-color);
+        border-radius: 10px;
+        color: var(--text-light);
+    }
+
+    /* Enhanced Contact Info */
+    .contact-info {
+        background: var(--gradient);
+        padding: 40px;
+        margin: 50px 0;
+        border-radius: 20px;
+        color: white;
+    }
+
+    .contact-info p {
+        font-size: 1.1rem;
+        margin: 20px 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 15px;
+    }
+
+    .contact-info i {
+        font-size: 1.4rem;
+        opacity: 0.9;
+    }
+
+    /* Enhanced Contact Form */
+    .contact-form {
+        background: white;
+        padding: 40px;
+        border-radius: 20px;
+        box-shadow: 0 8px 20px var(--shadow-color);
+    }
+
+    .form-group {
+        margin-bottom: 25px;
+    }
+
+    .form-group label {
+        font-weight: 600;
+        margin-bottom: 10px;
+        color: var(--primary-color);
+    }
+
+    .form-group input,
+    .form-group textarea {
+        padding: 15px;
+        border: 2px solid var(--border-color);
+        border-radius: 12px;
+        font-size: 1rem;
+        transition: var(--transition);
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+        border-color: var(--secondary-color);
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+    }
+
+    .submit-btn {
+        background: var(--gradient);
+        padding: 18px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px var(--shadow-color);
+    }
+
+    .submit-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px var(--shadow-color);
+    }
+
+    /* Enhanced Social Media */
+    .social-media {
+        right: 30px;
+        gap: 20px;
+    }
+
+    .social-media a {
+        width: 50px;
+        height: 50px;
+        font-size: 1.3rem;
+        background: var(--gradient);
+        box-shadow: 0 8px 15px var(--shadow-color);
+    }
+
+    .social-media a:hover {
+        transform: translateX(-5px) rotate(360deg);
+    }
+
+    /* Enhanced Responsive Design */
+    @media (max-width: 768px) {
+        .container {
+            margin: 20px;
+            padding: 30px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+        }
+
+        .contact-info {
+            padding: 30px 20px;
+        }
+
+        .social-media {
+            padding: 15px;
+            border-radius: 30px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .container {
+            margin: 10px;
+            padding: 20px;
+        }
+
+        h1 {
+            font-size: 2rem;
+        }
+
+        .contact-info p {
+            font-size: 1rem;
+        }
+
+        .social-media a {
+            width: 45px;
+            height: 45px;
+        }
+    }
+</style>

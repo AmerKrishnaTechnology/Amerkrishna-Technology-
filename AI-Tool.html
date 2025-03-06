@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Tools - AmerKrishna Technology</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #3b82f6;
+            --secondary-color: #1a1a2e;
+            --accent-color: #60a5fa;
+            --text-white: #ffffff;
+            --text-gray: #94a3b8;
+            --bg-dark: #0f0f1a;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: var(--bg-dark);
+            color: var(--text-white);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 120px 0 60px;
+            text-align: center;
+            background: linear-gradient(to bottom, rgba(15, 15, 26, 0.95), rgba(15, 15, 26, 0.98));
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(45deg, var(--primary-color), var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            color: var(--text-gray);
+            max-width: 600px;
+            margin: 0 auto 2rem;
+            font-size: 1.2rem;
+        }
+
+        /* AI Tools Grid */
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            padding: 4rem 0;
+        }
+
+        .tool-card {
+            background: var(--secondary-color);
+            border-radius: 15px;
+            padding: 2rem;
+            transition: var(--transition);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .tool-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .tool-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--primary-color);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .tool-icon i {
+            font-size: 1.8rem;
+            color: white;
+        }
+
+        .tool-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--text-white);
+        }
+
+        .tool-card p {
+            color: var(--text-gray);
+            margin-bottom: 1.5rem;
+        }
+
+        .tool-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            background: var(--primary-color);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: var(--transition);
+        }
+
+        .tool-btn:hover {
+            background: var(--accent-color);
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .tools-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Include your existing header -->
+    <header class="header">
+        <!-- Your existing header content -->
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h1>AI-Powered Tools</h1>
+            <p>Explore our suite of advanced AI tools designed to transform your business and streamline your workflows.</p>
+        </div>
+    </section>
+
+    <!-- AI Tools Section -->
+    <section class="container">
+        <div class="tools-grid">
+            <!-- Website Builder -->
+            <div class="tool-card">
+                <div class="tool-icon">
+                    <i class="fas fa-code"></i>
+                </div>
+                <h3>AI Website Builder</h3>
+                <p>Create stunning websites in minutes using our AI-powered website generator. Just describe what you want, and watch the magic happen.</p>
+                <a href="Website build.html" class="tool-btn">
+                    <i class="fas fa-magic"></i>
+                    Start Building
+                </a>
+            </div>
+
+            <!-- Content Generator -->
+            <div class="tool-card">
+                <div class="tool-icon">
+                    <i class="fas fa-pen-fancy"></i>
+                </div>
+                <h3>AI Content Generator</h3>
+                <p>Generate high-quality, SEO-optimized content for your website, blog, or marketing materials with our advanced AI.</p>
+                <a href="#" class="tool-btn">
+                    <i class="fas fa-pencil"></i>
+                    Generate Content
+                </a>
+            </div>
+
+            <!-- Image Generator -->
+            <div class="tool-card">
+                <div class="tool-icon">
+                    <i class="fas fa-image"></i>
+                </div>
+                <h3>AI Image Generator</h3>
+                <p>Create unique, custom images for your projects using our AI image generation tool. Perfect for marketing and design.</p>
+                <a href="#" class="tool-btn">
+                    <i class="fas fa-palette"></i>
+                    Create Images
+                </a>
+            </div>
+            <!-- Add after existing tool cards in the tools-grid section -->
+            <!-- AI Chatbot -->
+            <div class="tool-card">
+                <div class="tool-icon">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <h3>AI Chatbot Assistant</h3>
+                <p>Get instant answers to common questions with our smart chatbot. Powered by advanced pattern matching and natural language processing.</p>
+                <a href="chatbot.html" class="tool-btn">
+                    <i class="fas fa-comments"></i>
+                    Start Chat
+                </a>
+            </div>
+            
+            <!-- Smart Search -->
+            <div class="tool-card">
+                <div class="tool-icon">
+                    <i class="fas fa-search"></i>
+                </div>
+                <h3>AI-Powered Search</h3>
+                <p>Find exactly what you're looking for with our intelligent search system. Features smart filtering and relevant suggestions.</p>
+                <a href="smart-search.html" class="tool-btn">
+                    <i class="fas fa-search-plus"></i>
+                    Try Search
+                </a>
+            </div>
+            
+            <!-- Content Generator -->
+            <div class="tool-card">
+                <div class="tool-icon">
+                    <i class="fas fa-file-alt"></i>
+                </div>
+                <h3>Auto Content Generator</h3>
+                <p>Generate engaging content suggestions and auto-complete your writing with our ML-powered content assistant.</p>
+                <a href="content-generator.html" class="tool-btn">
+                    <i class="fas fa-pencil-alt"></i>
+                    Generate Content
+                </a>
+            </div>
+            
+            <!-- SEO Optimizer -->
+            <div class="tool-card">
+                <div class="tool-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h3>AI SEO Optimizer</h3>
+                <p>Automatically optimize your content for search engines with smart meta tag generation and SEO suggestions.</p>
+                <a href="seo-optimizer.html" class="tool-btn">
+                    <i class="fas fa-optimize"></i>
+                    Optimize Now
+                </a>
+            </div>
+            <!-- Add these new tool cards after the existing ones in the tools-grid section -->
+            
+            <!-- No-Code Builder -->
+            <div class="tool-card">
+                <div class="tool-icon">
+                    <i class="fas fa-magic"></i>
+                </div>
+                <h3>No-Code & Low-Code Builder</h3>
+                <p>Create stunning websites without coding knowledge using our drag & drop builder with pre-built templates.</p>
+                <a href="#" class="tool-btn">
+                    <i class="fas fa-wand-magic-sparkles"></i>
+                    Start Building
+                </a>
+            </div>
+
+            <!-- Custom Development -->
+            <div class="tool-card">
+                <div class="tool-icon">
+                    <i class="fas fa-code"></i>
+                </div>
+                <h3>Custom Development</h3>
+                <p>Tailored web and mobile applications built to your specifications with full-stack development capabilities.</p>
+                <a href="#" class="tool-btn">
+                    <i class="fas fa-laptop-code"></i>
+                    Learn More
+                </a>
+            </div>
+
+            <!-- Cloud Solutions -->
+            <div class="tool-card">
+                <div class="tool-icon">
+                    <i class="fas fa-cloud"></i>
+                </div>
+                <h3>Cloud Solutions</h3>
+                <p>Secure and scalable cloud hosting with auto-scaling, security monitoring, and 24/7 support.</p>
+                <a href="#" class="tool-btn">
+                    <i class="fas fa-server"></i>
+                    Get Started
+                </a>
+            </div>
+
+            <!-- E-Commerce Platform -->
+            <div class="tool-card">
+                <div class="tool-icon">
+                    <i class="fas fa-shopping-cart"></i>
+                </div>
+                <h3>E-Commerce Platform</h3>
+                <p>AI-powered online store builder with payment integration, inventory management, and analytics.</p>
+                <a href="#" class="tool-btn">
+                    <i class="fas fa-store"></i>
+                    Create Store
+                </a>
+            </div>
+
+            <!-- Progressive Web Apps -->
+            <div class="tool-card">
+                <div class="tool-icon">
+                    <i class="fas fa-mobile-alt"></i>
+                </div>
+                <h3>Progressive Web Apps</h3>
+                <p>Fast, mobile-friendly web applications with offline functionality and push notifications.</p>
+                <a href="#" class="tool-btn">
+                    <i class="fas fa-mobile-screen"></i>
+                    Explore PWAs
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Include your existing footer -->
+    <footer class="footer">
+        <!-- Your existing footer content -->
+    </footer>
+</body>
+</html>

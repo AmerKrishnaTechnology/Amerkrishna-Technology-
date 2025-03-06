@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auto Content Generator - AmerKrishna Technology</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #3b82f6;
+            --secondary-color: #1a1a2e;
+            --accent-color: #60a5fa;
+            --text-white: #ffffff;
+            --text-gray: #94a3b8;
+            --bg-dark: #0f0f1a;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: var(--bg-dark);
+            color: var(--text-white);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .generator-container {
+            background: var(--secondary-color);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-gray);
+        }
+
+        .input-group input,
+        .input-group textarea,
+        .input-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-white);
+        }
+
+        .suggestions {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            display: none;
+        }
+
+        .suggestion-item {
+            padding: 0.5rem;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .suggestion-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn:hover {
+            background: var(--accent-color);
+        }
+
+        .result {
+            margin-top: 2rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            display: none;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 1rem 0;
+        }
+
+        .loading i {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Auto Content Generator</h1>
+        <p>Generate engaging content with AI-powered suggestions</p>
+
+        <div class="generator-container">
+            <div class="input-group">
+                <label>Content Type</label>
+                <select id="contentType">
+                    <option value="blog">Blog Post</option>
+                    <option value="article">Article</option>
+                    <option value="social">Social Media Post</option>
+                    <option value="product">Product Description</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label>Topic/Keywords</label>
+                <input type="text" id="keywords" placeholder="Enter main keywords">
+            </div>
+
+            <div class="input-group">
+                <label>Content</label>
+                <textarea id="content" rows="8" placeholder="Start writing here..."></textarea>
+                <div id="suggestions" class="suggestions"></div>
+            </div>
+
+            <div class="loading">
+                <i class="fas fa-spinner"></i> Generating suggestions...
+            </div>
+
+            <button class="btn" onclick="generateContent()">
+                <i class="fas fa-magic"></i> Generate Suggestions
+            </button>
+
+            <div id="result" class="result"></div>
+        </div>
+    </div>
+
+    <script>
+        let typingTimer;
+        const doneTypingInterval = 1000;
+
+        document.getElementById('content').addEventListener('keyup', function() {
+            clearTimeout(typingTimer);
+            if (this.value) {
+                typingTimer = setTimeout(getSuggestions, doneTypingInterval);
+            }
+        });
+
+        async function getSuggestions() {
+            const content = document.getElementById('content').value;
+            const contentType = document.getElementById('contentType').value;
+            const keywords = document.getElementById('keywords').value;
+
+            if (content.length < 10) return;
+
+            document.querySelector('.loading').style.display = 'block';
+
+            try {
+                const response = await fetch('http://localhost:5000/api/suggest', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        content,
+                        contentType,
+                        keywords
+                    }),
+                });
+
+                const data = await response.json();
+                displaySuggestions(data.suggestions);
+            } catch (error) {
+                console.error('Error:', error);
+            } finally {
+                document.querySelector('.loading').style.display = 'none';
+            }
+        }
+
+        function displaySuggestions(suggestions) {
+            const suggestionsDiv = document.getElementById('suggestions');
+            suggestionsDiv.innerHTML = '';
+            suggestionsDiv.style.display = 'block';
+
+            suggestions.forEach(suggestion => {
+                const div = document.createElement('div');
+                div.className = 'suggestion-item';
+                div.textContent = suggestion;
+                div.onclick = () => applySuggestion(suggestion);
+                suggestionsDiv.appendChild(div);
+            });
+        }
+
+        function applySuggestion(suggestion) {
+            const contentArea = document.getElementById('content');
+            contentArea.value += ' ' + suggestion;
+            document.getElementById('suggestions').style.display = 'none';
+        }
+
+        async function generateContent() {
+            const contentType = document.getElementById('contentType').value;
+            const keywords = document.getElementById('keywords').value;
+
+            if (!keywords) {
+                alert('Please enter keywords');
+                return;
+            }
+
+            document.querySelector('.loading').style.display = 'block';
+
+            try {
+                const response = await fetch('http://localhost:5000/api/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        contentType,
+                        keywords
+                    }),
+                });
+
+                const data = await response.json();
+                const resultDiv = document.getElementById('result');
+                resultDiv.textContent = data.content;
+                resultDiv.style.display = 'block';
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Failed to generate content');
+            } finally {
+                document.querySelector('.loading').style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

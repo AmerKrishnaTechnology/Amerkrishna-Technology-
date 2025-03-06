@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Chatbot - AmerKrishna Technology</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Root variables and base styles */
+        :root {
+            --primary-color: #3b82f6;
+            --secondary-color: #1a1a2e;
+            --accent-color: #60a5fa;
+            --text-white: #ffffff;
+            --text-gray: #94a3b8;
+            --bg-dark: #0f0f1a;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: var(--bg-dark);
+            color: var(--text-white);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Chat container styles */
+        .chat-container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            background: var(--secondary-color);
+            border-radius: 15px;
+            overflow: hidden;
+            padding: 0;
+        }
+
+        .chat-header {
+            background: var(--primary-color);
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .chat-header h2 {
+            margin: 0;
+            color: var(--text-white);
+        }
+
+        .chat-messages {
+            height: 500px;
+            overflow-y: auto;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .message {
+            margin-bottom: 1rem;
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            max-width: 70%;
+            white-space: pre-line;
+            word-wrap: break-word;
+        }
+
+        .user-message {
+            background: var(--primary-color);
+            margin-left: auto;
+            color: var(--text-white);
+        }
+
+        .bot-message {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-white);
+        }
+
+        .chat-input {
+            display: flex;
+            padding: 1.5rem;
+            background: var(--secondary-color);
+            gap: 1rem;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-white);
+            font-size: 1rem;
+        }
+
+        .chat-input button {
+            padding: 0.75rem 1.5rem;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 1rem;
+        }
+
+        .chat-input button:hover {
+            background: var(--accent-color);
+            transform: translateY(-2px);
+        }
+
+        .typing {
+            background: rgba(255, 255, 255, 0.05) !important;
+            color: var(--text-gray);
+        }
+
+        /* Scrollbar styling */
+        .chat-messages::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .chat-messages::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 4px;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-color);
+        }
+.message {
+            margin-bottom: 1rem;
+            padding: 0.75rem 1rem;
+            border-radius: 10px;
+            max-width: 70%;
+            white-space: pre-line;
+            word-wrap: break-word;
+        }
+.message a {
+            color: var(--accent-color);
+            text-decoration: underline;
+        }
+
+        .message a:hover {
+            color: var(--text-white);
+        }
+        .user-message {
+            background: var(--primary-color);
+            margin-left: auto;
+        }
+
+        .bot-message {
+            background: #2d2d3d;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        .chat-input {
+            display: flex;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            gap: 1rem;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 0.75rem;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-white);
+        }
+
+        .chat-input button {
+            padding: 0.75rem 1.5rem;
+            background: var(--primary-color);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .chat-input button:hover {
+            background: var(--accent-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <h2>AmerKrishna AI Assistant</h2>
+        </div>
+        <div class="chat-messages" id="chatMessages">
+            <div class="message bot-message">
+             Well-come to Amerkrishna technology How may i Assist you?
+            </div>
+        </div>
+        <div class="chat-input">
+            <input type="text" id="userInput" placeholder="Type your message...">
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+    <!-- Add this before the closing </head> tag -->
+        <script src="https://cdn.jsdelivr.net/npm/@google/generative-ai"></script>
+    
+        <!-- Update the script section -->
+        <script>
+            // Predefined responses
+            // Add these new responses to the existing responses object
+            const responses = {
+                "hello": "Hi there! How can I assist you today?",
+                "hi": "Hello! How can I help you?",
+                "how are you": "I'm doing great! Thanks for asking. How can I assist you today?",
+                "what services": "We provide Web Development, Mobile Apps, AI Solutions, Cloud Services, and IT Consulting. Would you like more details on any of these?",
+                "pricing": "Our pricing depends on the project's scope and requirements. Could you specify the service you're interested in?",
+                "contact": `You can reach us through multiple channels:\n
+                    📱 WhatsApp: https://wa.me/9149858527\n
+                    📞 Phone: +91 914-985-8527\n
+                    📧 Email: support@amerkrishna.com\n
+                    🌐 Social Media:\n
+                    - Facebook: https://www.facebook.com/amerkrishna\n
+                    - Instagram: https://www.instagram.com/amerkrishna\n
+                    - LinkedIn: https://www.linkedin.com/company/amerkrishna`,
+                "whatsapp": "You can reach us on WhatsApp: https://wa.me/9149858527",
+                "phone": "Call us at: +91 914-985-8527",
+                "social media": `Connect with us on social media:\n
+                    - Facebook: https://www.facebook.com/amerkrishna\n
+                    - Instagram: https://www.instagram.com/amerkrishna\n
+                    - LinkedIn: https://www.linkedin.com/company/amerkrishna`,
+                "facebook": "Visit our Facebook page: https://www.facebook.com/amerkrishna",
+                "instagram": "Follow us on Instagram: https://www.instagram.com/amerkrishna",
+                "linkedin": "Connect with us on LinkedIn: https://www.linkedin.com/company/amerkrishna",
+                "office location": "We are based in India, but we provide services worldwide. Would you like to schedule a virtual meeting?",
+                "website development": "We specialize in building responsive and high-performance websites. Do you need an e-commerce site, a business website, or something else?",
+                "mobile app development": "We create both Android and iOS apps tailored to your business needs. Do you have an idea you'd like to discuss?",
+                "ai solutions": "We offer AI-based chatbots, predictive analytics, and automation tools. Would you like to integrate AI into your business?",
+                "cloud services": "We provide cloud hosting, migration, and security solutions. Are you looking to move your business to the cloud?",
+                "cybersecurity": "We offer firewall setups, penetration testing, and security audits to protect your digital assets.",
+                "support": "We provide 24/7 customer support. How can we assist you?",
+                "default": "I'm not sure about that. Would you like to speak with a human representative?",
+                "portfolio": "You can view our portfolio at our website. Would you like me to share some case studies?",
+                "technology stack": "We work with various technologies including React, Node.js, Python, Flutter, AWS, and more. What technology interests you?",
+                "consultation": "We offer free initial consultations. Would you like to schedule one?",
+                "project timeline": "Project timelines vary based on complexity. Generally, we can deliver: \n- Simple websites: 2-4 weeks\n- Complex web apps: 2-3 months\n- Mobile apps: 3-4 months",
+                "payment methods": "We accept various payment methods including bank transfer, credit cards, and international wire transfers.",
+                "development process": "Our development process includes: \n1. Requirements gathering\n2. Design phase\n3. Development\n4. Testing\n5. Deployment\n6. Maintenance",
+                "team": "Our team consists of experienced developers, designers, project managers, and QA specialists.",
+                "maintenance": "We provide ongoing maintenance and support for all our projects. Would you like to know about our maintenance packages?"
+            };
+    
+            async function sendMessage() {
+                const input = document.getElementById('userInput');
+                const message = input.value.trim().toLowerCase();
+                
+                if (!message) return;
+    
+                // Add user message
+                addMessage(input.value, 'user-message');
+                input.value = '';
+    
+                // Show typing indicator
+                const typingDiv = document.createElement('div');
+                typingDiv.className = 'message bot-message typing';
+                typingDiv.innerHTML = '<i class="fas fa-ellipsis-h"></i> Typing...';
+                const messages = document.getElementById('chatMessages');
+                messages.appendChild(typingDiv);
+                messages.scrollTop = messages.scrollHeight;
+    
+                // Simulate typing delay and find response
+                setTimeout(() => {
+                    typingDiv.remove();
+                    
+                    // Find matching response
+                    let response = responses.default;
+                    for (let key in responses) {
+                        if (message.includes(key)) {
+                            response = responses[key];
+                            break;
+                        }
+                    }
+                    
+                    // Add this function after the existing addMessage function
+                    function generateContent(type, keywords) {
+                        const contentTypes = {
+                            blog: "Here's a blog post outline about " + keywords + ":\n\n1. Introduction\n- Hook statement\n- Context\n- Main points\n\n2. Body\n- Key point 1\n- Supporting evidence\n- Examples\n\n3. Conclusion\n- Summary\n- Call to action",
+                            article: "Article structure for " + keywords + ":\n\n1. Title\n2. Introduction\n3. Main body points\n4. Expert quotes\n5. Conclusion",
+                            social: "Social media post draft:\n\n📢 Exciting update about " + keywords + "!\n\n🔑 Key points\n💡 Tips\n🔗 Link\n\n#hashtags #relevant #topics",
+                            product: "Product description template:\n\n✨ Features\n📋 Specifications\n💪 Benefits\n🎯 Target audience\n💰 Value proposition"
+                        };
+                    
+                        return contentTypes[type] || "Please specify a valid content type (blog, article, social, product)";
+                    }
+                    
+                    // Modify the existing sendMessage function to handle content generation
+                    async function sendMessage() {
+                        const input = document.getElementById('userInput');
+                        const message = input.value.trim().toLowerCase();
+                        
+                        if (!message) return;
+                    
+                        // Add user message
+                        addMessage(input.value, 'user-message');
+                        input.value = '';
+                    
+                        // Add this inside the setTimeout, before addMessage(response, 'bot-message')
+                        if (message.includes('generate') && message.includes('content')) {
+                            const keywords = message.replace(/generate|content/gi, '').trim();
+                            if (keywords) {
+                                const contentType = message.includes('blog') ? 'blog' :
+                                             message.includes('article') ? 'article' :
+                                             message.includes('social') ? 'social' :
+                                             message.includes('product') ? 'product' : '';
+                                        
+                                        if (contentType) {
+                                            response = generateContent(contentType, keywords);
+                                        }
+                                    }
+                                }
+                                
+                                addMessage(response, 'bot-message');
+                    }
+                }, 1000);
+            }
+    
+            function addMessage(text, className) {
+                const messages = document.getElementById('chatMessages');
+                const div = document.createElement('div');
+                div.className = `message ${className}`;
+                
+                // Handle newlines and formatting
+                const formattedText = text.replace(/\n/g, '<br>');
+                div.innerHTML = formattedText;
+                
+                messages.appendChild(div);
+                messages.scrollTop = messages.scrollHeight;
+            }
+    
+            // Handle Enter key
+            document.getElementById('userInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+        </script>
+</body>
+</html>

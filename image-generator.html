@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Image Generator - AmerKrishna Technology</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #3b82f6;
+            --secondary-color: #1a1a2e;
+            --accent-color: #60a5fa;
+            --text-white: #ffffff;
+            --text-gray: #94a3b8;
+            --bg-dark: #0f0f1a;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: var(--bg-dark);
+            color: var(--text-white);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .generator-container {
+            background: var(--secondary-color);
+            border-radius: 15px;
+            padding: 2rem;
+        }
+
+        .generator-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .generator-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, var(--primary-color), var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .input-section {
+            display: grid;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .input-group label {
+            color: var(--text-gray);
+        }
+
+        .input-group textarea {
+            padding: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-white);
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .option-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .option-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .option-item.active {
+            background: var(--primary-color);
+        }
+
+        .generate-btn {
+            width: 100%;
+            padding: 1rem;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: var(--transition);
+        }
+
+        .generate-btn:hover {
+            background: var(--accent-color);
+            transform: translateY(-2px);
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .result-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .result-image {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+        }
+
+        .result-actions {
+            padding: 1rem;
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .action-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: var(--transition);
+            background: var(--primary-color);
+            color: white;
+            flex: 1;
+        }
+
+        .action-btn:hover {
+            background: var(--accent-color);
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        .loading i {
+            font-size: 2rem;
+            color: var(--primary-color);
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="generator-container">
+            <div class="generator-header">
+                <h1>AI Image Generator</h1>
+                <p>Create unique images using artificial intelligence</p>
+            </div>
+
+            <div class="input-section">
+                <div class="input-group">
+                    <label>Image Description</label>
+                    <textarea id="prompt" placeholder="Describe the image you want to generate..."></textarea>
+                </div>
+
+                <div class="input-group">
+                    <label>Style</label>
+                    <div class="options-grid">
+                        <div class="option-item active">Realistic</div>
+                        <div class="option-item">Artistic</div>
+                        <div class="option-item">3D Render</div>
+                        <div class="option-item">Cartoon</div>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Size</label>
+                    <div class="options-grid">
+                        <div class="option-item active">512x512</div>
+                        <div class="option-item">1024x1024</div>
+                        <div class="option-item">Custom</div>
+                    </div>
+                </div>
+
+                <button class="generate-btn" onclick="generateImage()">
+                    <i class="fas fa-wand-magic-sparkles"></i>
+                    Generate Image
+                </button>
+            </div>
+
+            <div class="loading" id="loading">
+                <i class="fas fa-spinner"></i>
+                <p>Generating your image...</p>
+            </div>
+
+            <div class="results-grid" id="results">
+                <!-- Generated images will appear here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Style selection
+        document.querySelectorAll('.option-item').forEach(item => {
+            item.addEventListener('click', () => {
+                item.parentElement.querySelectorAll('.option-item').forEach(el => {
+                    el.classList.remove('active');
+                });
+                item.classList.add('active');
+            });
+        });
+
+        function generateImage() {
+            const prompt = document.getElementById('prompt').value;
+            if (!prompt) return;
+
+            // Show loading
+            document.getElementById('loading').style.display = 'block';
+
+            // Simulate image generation (replace with actual API call)
+            setTimeout(() => {
+                const resultsGrid = document.getElementById('results');
+                const imageCard = document.createElement('div');
+                imageCard.className = 'result-card';
+                
+                // Using a placeholder image (replace with generated image)
+                imageCard.innerHTML = `
+                    <img src="https://source.unsplash.com/random/512x512" class="result-image" alt="Generated image">
+                    <div class="result-actions">
+                        <button class="action-btn" onclick="downloadImage(this)">
+                            <i class="fas fa-download"></i> Download
+                        </button>
+                        <button class="action-btn" onclick="shareImage(this)">
+                            <i class="fas fa-share"></i> Share
+                        </button>
+                    </div>
+                `;
+                
+                resultsGrid.insertBefore(imageCard, resultsGrid.firstChild);
+                document.getElementById('loading').style.display = 'none';
+            }, 2000);
+        }
+
+        function downloadImage(button) {
+            const image = button.closest('.result-card').querySelector('img');
+            const link = document.createElement('a');
+            link.href = image.src;
+            link.download = 'generated-image.jpg';
+            link.click();
+        }
+
+        function shareImage(button) {
+            const image = button.closest('.result-card').querySelector('img');
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Generated Image',
+                    text: 'Check out this AI-generated image!',
+                    url: image.src
+                });
+            }
+        }
+    </script>
+</body>
+</html>
